@@ -1,0 +1,23 @@
+"""Main FastAPI application."""
+
+from fastapi import FastAPI
+from app.config import settings
+from app.db import Base, engine
+
+# Create tables
+async def lifespan(app: FastAPI):
+    """Lifespan context manager for startup/shutdown events."""
+    # Startup: create tables
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+    # Shutdown: close engine
+    await engine.dispose()
+
+
+# Initialize FastAPI app
+app = FastAPI(
+    lifespan=lifespan,
+)
+
+
