@@ -16,7 +16,6 @@ class Payment(TimestampedModel):
     method: Mapped[str] = mapped_column(String(20), nullable=False, default="payme")
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")
 
-    # Relationships
     user: Mapped["User"] = relationship("User", back_populates="payments")
 
     def __repr__(self):

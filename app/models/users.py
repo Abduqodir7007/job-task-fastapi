@@ -41,9 +41,7 @@ class User(TimestampedModel):
     first_name: Mapped[str] = mapped_column(String(50), nullable=False)
     last_name: Mapped[str] = mapped_column(String(50), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    is_staff: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
-    # Relationships
     roles: Mapped[List["Role"]] = relationship("Role", secondary=user_role_association, back_populates="users")
     payments: Mapped[List["Payment"]] = relationship("Payment", back_populates="user", cascade="all, delete-orphan")
 
