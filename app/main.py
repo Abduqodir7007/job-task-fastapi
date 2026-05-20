@@ -11,11 +11,6 @@ from app.api.payments import router as payments_router
 # Create tables
 async def lifespan(app: FastAPI):
     """Lifespan context manager for startup/shutdown events."""
-    # Startup: create tables
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    yield
-    # Shutdown: close engine
     await engine.dispose()
 
 
