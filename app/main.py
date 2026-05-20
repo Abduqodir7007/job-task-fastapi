@@ -8,9 +8,11 @@ from app.api.reports import router as reports_router
 from app.api.users import router as users_router
 from app.api.payments import router as payments_router
 
-# Create tables
 async def lifespan(app: FastAPI):
     """Lifespan context manager for startup/shutdown events."""
+    # Startup
+    yield
+    # Shutdown
     await engine.dispose()
 
 
