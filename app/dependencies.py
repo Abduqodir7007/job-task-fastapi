@@ -4,6 +4,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
 from app.db import get_db
 from app.models.users import User
 from app.utils import verify_token
@@ -15,7 +16,6 @@ async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
     db: AsyncSession = Depends(get_db),
 ) -> User:
-
     token = credentials.credentials
 
     payload = verify_token(token)
@@ -33,7 +33,7 @@ async def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    result = await db.execute(select(User).where(User.id == int(user_id)))
+    result = await db.execute(select(User).options(selectinload(User.roles)).where(User.id == int(user_id)))
     user = result.scalars().first()
 
     if not user:
@@ -41,7 +41,7 @@ async def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not found",
         )
-
+    
     return user
 
 

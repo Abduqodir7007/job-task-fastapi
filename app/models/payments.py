@@ -3,7 +3,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.orm import relationship
 from app.models.base_models import TimestampedModel
 from app.db import Base
-from .users import User
+from app.models.users import User
 
 
 class Payment(TimestampedModel):
