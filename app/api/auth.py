@@ -7,8 +7,9 @@ from app.db import get_db
 from app.models.users import User, Role
 from app.schemas.users import UserRegisterSchema, UserLoginSchema, TokenSchema, UserResponseSchema
 from app.utils import hash_password, verify_password, create_access_token, create_refresh_token
+from app.dependencies import get_current_user
 
-router = APIRouter(prefix="/api", tags=["auth"])
+router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
 @router.post("/register", response_model=TokenSchema, status_code=status.HTTP_201_CREATED)
@@ -33,7 +34,6 @@ async def register(user_data: UserRegisterSchema, db: AsyncSession = Depends(get
         first_name=user_data.first_name,
         last_name=user_data.last_name,
         is_active=True,
-        is_staff=False,
     )
     user.roles = roles
 
@@ -69,3 +69,8 @@ async def login(user_data: UserLoginSchema, db: AsyncSession = Depends(get_db)):
         "refresh_token": refresh_token,
         "token_type": "bearer",
     }
+
+
+@router.get("/me", response_model=UserResponseSchema)
+async def get_current_user_info(current_user: User = Depends(get_current_user)):
+    return current_user

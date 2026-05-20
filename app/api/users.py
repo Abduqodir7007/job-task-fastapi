@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import func, or_
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
@@ -37,11 +38,26 @@ async def _get_roles_or_400(db: AsyncSession, role_ids: list[int]) -> list[Role]
 async def list_users(
     skip: int = 0,
     limit: int = 100,
+    search: str | None = None,
+    role: str | None = None,
     db: AsyncSession = Depends(get_db),
 ):
-    result = await db.execute(
-        select(User).options(selectinload(User.roles)).order_by(User.id).offset(skip).limit(limit)
-    )
+    query = select(User).options(selectinload(User.roles)).order_by(User.id)
+
+    if search:
+        search_term = f"%{search.strip()}%"
+        query = query.where(
+            or_(
+                User.first_name.ilike(search_term),
+                User.last_name.ilike(search_term),
+            )
+        )
+
+    if role:
+        query = query.where(User.roles.any(func.lower(Role.name) == role.strip().lower()))
+
+    query = query.offset(skip).limit(limit)
+    result = await db.execute(query)
     return result.scalars().all()
 
 
@@ -80,7 +96,7 @@ async def update_user(
     db: AsyncSession = Depends(get_db),
 ):
     user = await _get_user_or_404(db, user_id)
-    
+
     if payload.password is not None:
         user.password = hash_password(payload.password)
 
@@ -99,7 +115,6 @@ async def update_user(
 
     await db.commit()
     return await _get_user_or_404(db, user.id)
-
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(user_id: int, db: AsyncSession = Depends(get_db)):

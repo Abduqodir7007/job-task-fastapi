@@ -1,11 +1,20 @@
 from pydantic import BaseModel, EmailStr, field_validator
 from typing import List, Optional
+from enum import Enum
+
+
+class RoleEnum(str, Enum):
+    user = "user"
+    admin = "admin"
+    payment = "payment"
+    reports = "reports"
 
 
 class RoleSchema(BaseModel):
     """Role response schema."""
+
     id: int
-    name: str
+    name: RoleEnum
 
     class Config:
         from_attributes = True
@@ -13,6 +22,7 @@ class RoleSchema(BaseModel):
 
 class UserRegisterSchema(BaseModel):
     """User registration schema."""
+
     email: EmailStr
     password: str
     first_name: str
@@ -43,12 +53,14 @@ class UserRegisterSchema(BaseModel):
 
 class UserLoginSchema(BaseModel):
     """User login schema."""
+
     email: EmailStr
     password: str
 
 
 class TokenSchema(BaseModel):
     """Token response schema."""
+
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
@@ -56,6 +68,7 @@ class TokenSchema(BaseModel):
 
 class UserResponseSchema(BaseModel):
     """User response schema."""
+
     id: int
     email: str
     first_name: str
@@ -69,6 +82,7 @@ class UserResponseSchema(BaseModel):
 
 class UserDetailSchema(BaseModel):
     """User detail schema."""
+
     id: int
     email: str
     first_name: str
