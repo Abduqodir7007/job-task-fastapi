@@ -7,7 +7,7 @@ FastAPI application with JWT authentication, role-based access control, user man
 ### 1. Clone the project
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Abduqodir7007/job-task-fastapi.git 
 cd task-application-fastapi
 ```
 
